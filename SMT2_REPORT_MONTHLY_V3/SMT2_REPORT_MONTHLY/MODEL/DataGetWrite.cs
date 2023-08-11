@@ -12,6 +12,7 @@ namespace QA_TVN2_REPORT_MONTHLY.MODEL
         public long Qty { get; set; }
         public string KH { get; set; }
         public string Mat { get; set; }
+        public long PointQty { get; set; }
         
 
         public DataDD()
@@ -25,6 +26,7 @@ namespace QA_TVN2_REPORT_MONTHLY.MODEL
             this.Qty = s.Qty;
             this.KH = s.KH;
             this.Mat = s.Mat;
+            this.PointQty = s.PointQty;
            
         }
 

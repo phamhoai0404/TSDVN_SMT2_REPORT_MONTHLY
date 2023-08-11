@@ -127,11 +127,14 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
             config.Model.ColName = ConfigurationManager.AppSettings["FILE_DD_COL_MODEL"];
             config.KH.ColName = ConfigurationManager.AppSettings["FILE_DD_COL_KH"];
             config.Qty.ColName = ConfigurationManager.AppSettings["FILE_DD_COL_QTY"];
+            config.Qty.ColName = ConfigurationManager.AppSettings["FILE_DD_COL_QTY"];
+            config.PointQty.ColName = ConfigurationManager.AppSettings["FILE_DD_COL_POINTQTY"];
 
             config.Mat.GetIndexColumn();
             config.Model.GetIndexColumn();
             config.KH.GetIndexColumn();
             config.Qty.GetIndexColumn();
+            config.PointQty.GetIndexColumn();
 
             int maxVariable = Math.Max(config.Model.Index, Math.Max(config.KH.Index, Math.Max(config.Mat.Index, config.Qty.Index)));
             config.ColLast = MyFunction1.ConvertNumberToName(maxVariable + 1);//vi no dang bi tru di 1 nen la

@@ -15,7 +15,8 @@ namespace QA_TVN2_REPORT_MONTHLY.MODEL
         public Address Model { get; set; }
         public Address Qty { get; set; }
         public Address KH { get; set; }
-
+        
+        public Address PointQty { get; set; }
         public Address Mat { get; set; }
 
         public string ColLast { get; set; }
@@ -26,6 +27,7 @@ namespace QA_TVN2_REPORT_MONTHLY.MODEL
             this.Model = new Address();
             this.Qty = new Address();
             this.KH = new Address();
+            this.PointQty = new Address();
         }
     }
    

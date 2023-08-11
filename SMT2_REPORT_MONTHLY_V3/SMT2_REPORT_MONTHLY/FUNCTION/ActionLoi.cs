@@ -79,27 +79,27 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
             }
         }
 
-        public static void ParingError(ref List<DataDD> listDD, ref List<DataError> listError)
+        public static void ParingError(List<DataDD> listDD, ref List<DataError> listError)
         {
-            //NEU MA THAT SU THI BO COMMENT
-            //Kiem tra model ma khong ton tai trong listDD thi bao lỗi
-            var processedModels = new HashSet<string>();
-            foreach (var item in listError)
-            {
-                if (processedModels.Contains(item.Model))
-                    continue;
-                //LUC THAT THI ENABLE CAI NAY
-                if (!listDD.Any(p => p.Model == item.Model))
-                {
-                    string temp = $"Cần xem lại lỗi ở Model: {item.ToString()} => Không tồn tại Model trong danh sách điểm dán hoặc số lượng của Model trong file Điểm dán = 0! => Bạn có muốn tiếp tục?";
-                    DialogResult result = MessageBox.Show(temp, "Cảnh báo!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (result == DialogResult.No)
-                    {
-                        throw new Exception("Bạn đã dừng chương trình!");
-                    }
-                }
-                processedModels.Add(item.Model);
-            }
+            ////NEU MA THAT SU THI BO COMMENT
+            ////Kiem tra model ma khong ton tai trong listDD thi bao lỗi
+            //var processedModels = new HashSet<string>();
+            //foreach (var item in listError)
+            //{
+            //    if (processedModels.Contains(item.Model))
+            //        continue;
+            //    //LUC THAT THI ENABLE CAI NAY
+            //    if (!listDD.Any(p => p.Model == item.Model))
+            //    {
+            //        string temp = $"Cần xem lại lỗi ở Model: {item.ToString()} => Không tồn tại Model trong danh sách điểm dán hoặc số lượng của Model trong file Điểm dán = 0! => Bạn có muốn tiếp tục?";
+            //        DialogResult result = MessageBox.Show(temp, "Cảnh báo!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            //        if (result == DialogResult.No)
+            //        {
+            //            throw new Exception("Bạn đã dừng chương trình!");
+            //        }
+            //    }
+            //    processedModels.Add(item.Model);
+            //}
 
             int colRISO = MdlCommon.LIST_ERROR_RISO.Count();
             int colOKI = MdlCommon.LIST_ERROR_OKIDENKI.Count();

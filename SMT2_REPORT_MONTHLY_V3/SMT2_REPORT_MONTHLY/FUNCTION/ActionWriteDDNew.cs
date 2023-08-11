@@ -11,10 +11,13 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
 {
     public class ActionWriteDDNew
     {
-        public static void WriteData(List<DataDD> listDD, List<DataError> listErr, TypeWrite type, ref string newFile, string date)
+        public static void WriteData(List<DataDD> listDataDDFrist, List<DataError> listErr, TypeWrite type, ref string newFile, string date)
         {
             try
             {
+                List<DataDD> listDD = new List<DataDD>();//Du lieu diem dan sau gop
+                ActionDD.MerageValue(ref listDataDDFrist, ref listDD);
+
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 FileInfo fileTemp = new FileInfo(MdlCommon.PATH_TEMPLATE);
                 using (var package = new ExcelPackage(fileTemp))
@@ -42,7 +45,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                     }
 
                     worksheet = package.Workbook.Worksheets[MdlCommon.TYPE_NAME_ALL];
-                    GetAll(worksheet, listDD, listErr);
+                    GetAll(worksheet, listDataDDFrist, listErr, listDD);
 
                     worksheet = package.Workbook.Worksheets[MdlCommon.TYPE_NAME_DATA_ERROR];
                     GetDataError(worksheet, listErr);
@@ -70,7 +73,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
 
             string colStartError = listTitle[0].Address.ColName;
             int numberCol = listTitle.Count();
-            object[,] data = new object[listModel.GetLength(0), 3];
+            object[,] data = new object[listModel.GetLength(0), 5];
             object[,] data333 = new object[listModel.GetLength(0), numberCol];
             long[] tempSum = new long[numberCol];//Thuc hien luu tru mang rieng
             string tempModel = "";
@@ -101,7 +104,10 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                         }
                         data333[i, u] = tempSum[u] == 0 ? (long?)null : tempSum[u];
                     }
-                    data[i, 2] = listErrorChild.Sum(p => p.listErr.Sum(z => z));
+                    
+                    data[i, 2] = listTemp.Sum(p => p.PointQty);
+                    data[i, 3] = listTemp.Sum(p => p.PointQty * p.Qty);
+                    data[i, 4] = listErrorChild.Sum(p => p.listErr.Sum(z => z));
 
                 }
                 else
@@ -109,6 +115,8 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                     data[i, 0] = listModel[i, 1]?.ToString() + listModel[i, 0].ToString();//Thuc hien lay truc tiep luon vi  du lieu cua SMT la lay truc tiep
                     data[i, 1] = 0;
                     data[i, 2] = 0;
+                    data[i, 3] = 0;
+                    data[i, 4] = 0;
                 }
             }
 
@@ -132,7 +140,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
             string colStartError = listTitle[0].Address.ColName;
             int numberCol = listTitle.Count();
 
-            object[,] data = new object[listChild.Count(), 3];
+            object[,] data = new object[listChild.Count(), 5];
             object[,] data333 = new object[listChild.Count(), numberCol];
             long[] tempSum = new long[numberCol];
             for (int i = 0; i < listChild.Count(); i++)
@@ -150,7 +158,10 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                     }
                     data333[i, u] = tempSum[u] == 0 ? (long?)null : tempSum[u];
                 }
-                data[i, 2] = listErrorChild.Sum(p => p.listErr.Sum(z => z));
+                
+                data[i, 2] = listChild[i].PointQty;
+                data[i, 3] = listChild[i].PointQty * listChild[i].Qty;
+                data[i, 4] = listErrorChild.Sum(p => p.listErr.Sum(z => z));
             }
             int rowWrite = MdlCommon.ROW_TITTLE_GET_TEMPLATE + 1;
             ws.Cells[$"A{rowWrite}:A{listChild.Count() + rowWrite}"].Value = data;
@@ -162,7 +173,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
 
         private static void WriteDataChild(ExcelWorksheet ws, List<DataDD> listDD, List<DataError> listError, string date, string typeKH, List<TitleError> listTitle)
         {
-            long numberQty1 = listDD.Where(p => typeKH.Contains(p.KH)).Sum(p => p.Qty);
+            long numberQty1 = listDD.Where(p => typeKH.Contains(p.KH)).Sum(p => p.Qty * p.PointQty);
             long numberErr1 = listError.Where(p => typeKH.Contains(p.KH)).Sum(p => p.QtyError);
             int rowWrite = MdlCommon.ROW_TITTLE_GET_TEMPLATE + 1;
             ws.Cells[$"A{rowWrite}"].Value = date + "月";
@@ -247,21 +258,12 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
             }
             ws.Cells[$"A{startRow}:A{listErrGroup.Count() + startRow}"].Value = data;
         }
-        private static void GetAll(ExcelWorksheet ws, List<DataDD> listG2, List<DataError> listErr)
+        private static void GetAll(ExcelWorksheet ws, List<DataDD> listG2, List<DataError> listErr, List<DataDD> listAfter)
         {
             listG2 = listG2.OrderBy(p => p.Model).ToList();
             int startRow = 3;
-            object[,] data = new object[listG2.Count(), 5];
-            for (int i = 0; i < listG2.Count(); i++)
-            {
-                data[i, 0] = i + 1;
-                data[i, 1] = listG2[i].KH;
-                data[i, 2] = listG2[i].Model;
-                data[i, 3] = listG2[i].Mat;
-                data[i, 4] = listG2[i].Qty;
-            }
-            ws.Cells[$"A{startRow}:A{listG2.Count() + startRow}"].Value = data;
-
+            WriteChildDD(ws, listG2, startRow, "A");
+            WriteChildDD(ws, listAfter, startRow, "S");
             object[,] data2 = new object[listErr.Count(), 8];
             for (int i = 0; i < listErr.Count(); i++)
             {
@@ -275,8 +277,20 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                 data2[i, 7] = listErr[i].ContentKH;
             }
             ws.Cells[$"I{startRow}:I{listG2.Count() + startRow}"].Value = data2;
-
-
+        }
+        private static void WriteChildDD(ExcelWorksheet ws, List<DataDD> listG2, int startRow, string nameColFirst)
+        {
+            object[,] data = new object[listG2.Count(), 6];
+            for (int i = 0; i < listG2.Count(); i++)
+            {
+                data[i, 0] = i + 1;
+                data[i, 1] = listG2[i].KH;
+                data[i, 2] = listG2[i].Model;
+                data[i, 3] = listG2[i].Mat;
+                data[i, 4] = listG2[i].Qty;
+                data[i, 5] = listG2[i].PointQty;
+            }
+            ws.Cells[$"{nameColFirst}{startRow}:{nameColFirst}{listG2.Count() + startRow}"].Value = data;
         }
         private static List<DataError4> GetError4(List<DataError> listTemp)
         {

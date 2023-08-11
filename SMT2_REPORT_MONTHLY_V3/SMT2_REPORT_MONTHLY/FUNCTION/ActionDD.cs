@@ -11,11 +11,10 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
 {
     public class ActionDD
     {
-        public static void GetValueDD(ref List<DataDD> listDDAfter, DataConfigDD configDD, DateTime monthGet)
+        public static void GetValueDD(ref List<DataDD> listDD, DataConfigDD configDD, DateTime monthGet)
         {
             try
             {
-                List<DataDD> listDD = new List<DataDD>();
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using (var package = new ExcelPackage(new FileInfo(configDD.pathFile), false))
                 {
@@ -29,6 +28,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
 
                     DataDD tempValue = new DataDD();
                     long numberQty = 0;
+                    long numberPointQty = 0;
                     for (int i = 0; i < rowAll; i++)
                     {
                         if (!(listAll[i, configDD.Model.Index] is string) ||
@@ -53,11 +53,18 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                         if (numberQty <= 0)//Neu so luong <= 0 thi duyet cai khac
                             continue;
 
+                        //Thuc hien lay so luong
+                        if (!long.TryParse(listAll[i, configDD.PointQty.Index]?.ToString(), out numberPointQty))
+                            throw new Exception(string.Format(RESULT.ERROR_DATA, "Số điểm LK", configDD.PointQty.ColName + (i + 1), listAll[i, configDD.PointQty.Index]));
+                        if (numberPointQty <= 0)
+                            throw new Exception($"Số điểm linh kiện  {configDD.PointQty.ColName + (i + 1)}{listAll[i, configDD.PointQty.Index]} = {numberPointQty} => Cần xem lại!");
+
                         if (!(listAll[i, configDD.Mat.Index] is string) || string.IsNullOrWhiteSpace(listAll[i, configDD.Mat.Index].ToString()))
                             throw new Exception(string.Format(RESULT.ERROR_DATA, "Mặt", configDD.Mat.ColName + (i + 1), listAll[i, configDD.Mat.Index]));
 
                         tempValue.KH = listAll[i, configDD.KH.Index].ToString().Trim().ToUpper();
                         tempValue.Qty = numberQty;
+                        tempValue.PointQty = numberPointQty;
                         tempValue.Mat = listAll[i, configDD.Mat.Index].ToString().Trim().ToUpper();
 
                         listDD.Add(new DataDD(tempValue));
@@ -68,7 +75,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                     }
                 }
 
-                PairingDD(listDD, ref listDDAfter);
+                CheckValue(listDD);
             }
             catch (Exception ex)
             {
@@ -76,7 +83,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
             }
         }
 
-        private static void PairingDD(List<DataDD> listTemp, ref List<DataDD> listAfter)
+        private static void CheckValue(List<DataDD> listTemp)
         {
             var processedModels = new HashSet<string>();
 
@@ -98,6 +105,12 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                 processedModels.Add(item.Model);
             }
 
+            
+        }
+
+        public static void MerageValue(ref List<DataDD> listTemp, ref List<DataDD> listAfter)
+        {
+            listTemp = listTemp.OrderBy(p => p.Model).ToList();
             // Thuc hien gop du lieu
             listAfter = listTemp.GroupBy(p => new { p.KH, p.Model })
                             .Select(group =>
@@ -109,7 +122,8 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                                         KH = group.Key.KH,
                                         Mat = group.First().Mat,
                                         Model = group.Key.Model,
-                                        Qty = group.First().Qty
+                                        Qty = group.First().Qty,
+                                        PointQty = group.First().PointQty,
                                     };
                                 }
                                 else
@@ -119,10 +133,13 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                                         KH = group.Key.KH,
                                         Mat = "2",
                                         Model = group.Key.Model,
-                                        Qty = group.First().Qty
+                                        Qty = group.First().Qty,
+                                        PointQty = group.Sum(p => p.PointQty),
+                                       
                                     };
                                 }
                             })
+                            .OrderBy(p=>p.Model)
                             .ToList();
         }
     }
