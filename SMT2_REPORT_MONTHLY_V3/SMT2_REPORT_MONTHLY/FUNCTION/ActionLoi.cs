@@ -83,23 +83,23 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
         {
             ////NEU MA THAT SU THI BO COMMENT
             ////Kiem tra model ma khong ton tai trong listDD thi bao lỗi
-            //var processedModels = new HashSet<string>();
-            //foreach (var item in listError)
-            //{
-            //    if (processedModels.Contains(item.Model))
-            //        continue;
-            //    //LUC THAT THI ENABLE CAI NAY
-            //    if (!listDD.Any(p => p.Model == item.Model))
-            //    {
-            //        string temp = $"Cần xem lại lỗi ở Model: {item.ToString()} => Không tồn tại Model trong danh sách điểm dán hoặc số lượng của Model trong file Điểm dán = 0! => Bạn có muốn tiếp tục?";
-            //        DialogResult result = MessageBox.Show(temp, "Cảnh báo!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            //        if (result == DialogResult.No)
-            //        {
-            //            throw new Exception("Bạn đã dừng chương trình!");
-            //        }
-            //    }
-            //    processedModels.Add(item.Model);
-            //}
+            var processedModels = new HashSet<string>();
+            foreach (var item in listError)
+            {
+                if (processedModels.Contains(item.Model))
+                    continue;
+                //LUC THAT THI ENABLE CAI NAY
+                if (!listDD.Any(p => p.Model == item.Model))
+                {
+                    string temp = $"Cần xem lại lỗi ở Model: {item.ToString()} => Không tồn tại Model trong danh sách điểm dán hoặc số lượng của Model trong file Điểm dán = 0! => Bạn có muốn tiếp tục?";
+                    DialogResult result = MessageBox.Show(temp, "Cảnh báo!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result == DialogResult.No)
+                    {
+                        throw new Exception("Bạn đã dừng chương trình!");
+                    }
+                }
+                processedModels.Add(item.Model);
+            }
 
             int colRISO = MdlCommon.LIST_ERROR_RISO.Count();
             int colOKI = MdlCommon.LIST_ERROR_OKIDENKI.Count();
@@ -131,6 +131,17 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
         }
         private static void GetTypeError(ref DataError value, List<TitleError> listTitle, int col)
         {
+            //Neu du lieu loi khong co thi mac dinh se la khac
+            if (string.IsNullOrWhiteSpace(value.ContentKH))
+            {
+                for (int i = 0; i < col - 1; i++)
+                {
+                    value.listErr.Add(0);
+                }
+                value.listErr.Add(value.QtyError);
+                return;
+            }
+
             bool checkType = false;
             for (int i = 0; i < col; i++)
             {

@@ -87,7 +87,7 @@ namespace QA_TVN2_REPORT_MONTHLY
                 string fileName = "";
                ActionWriteDDNew.WriteData(listDD, listError, this.typeGet, ref fileName, this.txtMonth.Text);
 
-                MessageBox.Show($"Tạo file thành công !", "Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Tạo file thành công: {fileName} !", "Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             }
             catch (Exception ex)
@@ -207,8 +207,8 @@ namespace QA_TVN2_REPORT_MONTHLY
             {
                 this.setTime.Stop();
 
-                this.txtDiemDanFile.Text = @"D:\hoai\Hoai_Daotao\vs\SMT\SMT2_REPORT_MONTHLY\Tai_lieu\TVN2-QUẢN LÍ ĐIỂM DÁN HÀNG NGÀY T7.2023.xlsx";
-                this.txtLoiFile.Text = @"D:\hoai\Hoai_Daotao\vs\SMT\SMT2_REPORT_MONTHLY\Tai_lieu\SMT2- LOI TT TRONG CONG DOAN T07.xlsx";
+                //this.txtDiemDanFile.Text = @"D:\hoai\Hoai_Daotao\vs\SMT\SMT2_REPORT_MONTHLY\Tai_lieu\TVN2-QUẢN LÍ ĐIỂM DÁN HÀNG NGÀY T7.2023.xlsx";
+               // this.txtLoiFile.Text = @"D:\hoai\Hoai_Daotao\vs\SMT\SMT2_REPORT_MONTHLY\Tai_lieu\SMT2- LOI TT TRONG CONG DOAN T07.xlsx";
                 this.txtLoiSheetName.Text = "Dữ liệu";
                 this.txtDiemDanSheetName.Text = DateTime.Now.AddMonths(-1).ToString("yyyy");
 

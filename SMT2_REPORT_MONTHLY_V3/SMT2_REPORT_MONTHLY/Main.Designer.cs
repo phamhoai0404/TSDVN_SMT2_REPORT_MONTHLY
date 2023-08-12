@@ -99,7 +99,7 @@ namespace QA_TVN2_REPORT_MONTHLY
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(152, 13);
             this.label8.TabIndex = 19;
-            this.label8.Text = "Phiên bản: 11/08/2023 14h25";
+            this.label8.Text = "Phiên bản: 12/08/2023 19h23";
             // 
             // lblDisplay
             // 

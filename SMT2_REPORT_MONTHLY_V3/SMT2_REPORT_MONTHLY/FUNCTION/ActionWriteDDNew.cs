@@ -148,7 +148,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                 data[i, 0] = listChild[i].Model;
                 data[i, 1] = listChild[i].Qty;
 
-                var listErrorChild = listErr.Where(p => p.Model == listChild[i].Model && typeKH.Contains(listChild[i].KH)).ToList();
+                var listErrorChild = listErr.Where(p => p.Model == listChild[i].Model && typeKH.Contains(p.KH)).ToList();
                 for (int u = 0; u < numberCol; u++)
                 {
                     tempSum[u] = 0; // Reset tổng trước khi tính lại
@@ -276,7 +276,7 @@ namespace QA_TVN2_REPORT_MONTHLY.FUNCTION
                 data2[i, 6] = listErr[i].Content;
                 data2[i, 7] = listErr[i].ContentKH;
             }
-            ws.Cells[$"I{startRow}:I{listG2.Count() + startRow}"].Value = data2;
+            ws.Cells[$"I{startRow}:I{listErr.Count() + startRow}"].Value = data2;
         }
         private static void WriteChildDD(ExcelWorksheet ws, List<DataDD> listG2, int startRow, string nameColFirst)
         {
